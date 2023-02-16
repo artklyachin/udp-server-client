@@ -30,6 +30,9 @@ int main(int argc, char* argv[])
     char message[MAX_BUF_SIZE], answer[MAX_BUF_SIZE];
     while (1) {
 
+        printf("сообщение к серверу: ");
+        fflush(stdout);
+
         if (scanf("%s", message) == EOF) {
             perror("scanf");
             break;
@@ -47,6 +50,29 @@ int main(int argc, char* argv[])
             perror("write");
             break;
         }
+
+        printf("ответ сервера: ");
+        fflush(stdout);
+
+        // Получаем от сервера сообщение
+        int read_result = recvfrom(
+            socket_fd,
+            (char*)answer,
+            sizeof(answer),
+            0,
+            (struct sockaddr*)&ipv4_addr,
+            &len);
+        if (read_result == -1) {
+            perror("read");
+            break;
+        } else if (read_result == 0) {
+            perror("closed connection");
+            break;
+        } else {
+            printf("%s\n", answer);
+            fflush(stdout);
+        }
+
     }
 
     // Закрываем соединение и сокет

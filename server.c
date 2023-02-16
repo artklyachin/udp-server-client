@@ -34,6 +34,9 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+    printf("ожидание сообщения от клиента.\n");
+    fflush(stdout);
+
     char answer[MAX_BUF_SIZE], message[MAX_BUF_SIZE];
     while (1) {
 
@@ -53,10 +56,31 @@ int main(int argc, char* argv[])
             perror("closed connection\n");
             break;
         } else {
+            printf("сообщение от клиента: ");
             printf("%s\n", answer);
             fflush(stdout);
         };
 
+        printf("ответ клиенту: ");
+        fflush(stdout);
+
+        if (scanf("%s", message) == EOF) {
+            perror("scanf");
+            break;
+        }
+
+        // Отправляем клиенту сообщение
+        int rv = sendto(
+            socket_fd,
+            &message,
+            sizeof(message),
+            0,
+            (struct sockaddr*)&clnt_addr,
+            clnt_addr_len);
+        if (rv == -1) {
+            perror("write");
+            break;
+        }
     }
 
     // Закрываем соединение и сокет
